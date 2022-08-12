@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -29,15 +30,13 @@ public class RentalRecordService {
         this.rentalRecordRepository = rentalRecordRepository;
     }
 
-    public float getTotalPrice(Float price, Date returnDate, Date reserveDate){
+    public float getTotalPrice(Float price, LocalDateTime returnDate, LocalDateTime reserveDate){
         float totalPrice = price;
-        Long diffInMilli = returnDate.toInstant().toEpochMilli() - reserveDate.toInstant().toEpochMilli();
-        int diffInDays = diffInMilli.intValue() / 86400000 ;
+        Long diffInDays = returnDate.toLocalDate().toEpochDay() - reserveDate.toLocalDate().toEpochDay();
         return totalPrice * diffInDays;
     }
 
     public ResponseEntity<Object> addRentalRecord(RentalRecord record) {
-        record.setReservationDate(new Date());
         record.setTotalPrice(getTotalPrice(record.getCar().getPrice(), record.getReturnDate(),
                 record.getReservationDate()));
         RentalRecord savedRecord = rentalRecordRepository.save(record);
@@ -97,9 +96,6 @@ public class RentalRecordService {
         updatedRecord.setReturnDate(record.getReturnDate());
         updatedRecord.setTotalPrice(getTotalPrice(record.getCar().getPrice(), record.getReturnDate(),
                 record.getReservationDate()));
-        if (record.getCollectionDate().toInstant().toEpochMilli() > 0) {
-            record.getCar().setInUse(true);
-        }
         return updatedRecord;
     }
 }

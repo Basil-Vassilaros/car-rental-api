@@ -3,6 +3,7 @@ package com.sisekelo.carrentalapi.models;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -22,14 +23,14 @@ public class RentalRecord {
     @JoinColumn(name="clientId", nullable = false, updatable = false)
     private Client client;
 
-    @Column(nullable = false)
-    private Date reservationDate;
+    @Column(nullable = false, columnDefinition = "TIMESTAMP")
+    private LocalDateTime reservationDate;
 
-    @Column(nullable = false)
-    private Date collectionDate;
+    @Column(nullable = false, columnDefinition = "TIMESTAMP")
+    private LocalDateTime collectionDate;
 
-    @Column(nullable = false)
-    private Date returnDate;
+    @Column(nullable = false, columnDefinition = "TIMESTAMP")
+    private LocalDateTime returnDate;
 
     @Column(nullable = false)
     private Float totalPrice;

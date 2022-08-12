@@ -9,6 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Service
 public class ReservationService {
     private CarManufacturerRepository carManufacturerRepository;
@@ -47,6 +52,7 @@ public class ReservationService {
             newRecord.setCar(carRepository.getReferenceById(reservation.getCarId()));
             newRecord.setClient(clientRepository.getReferenceById(reservation.getClientId()));
             newRecord.setCollectionDate(reservation.getCollectionDate());
+            newRecord.setReservationDate(LocalDateTime.now());
             newRecord.setReturnDate(reservation.getReturnDate());
 
             Car carReserved = carRepository.getReferenceById(reservation.getCarId());
@@ -62,6 +68,19 @@ public class ReservationService {
         }
         else {
             return ResponseEntity.unprocessableEntity().body("Failed to record reservation");
+        }
+    }
+
+    public ResponseEntity<Object> addBooking(Long id){
+        if (rentalRecordRepository.findById(id).isPresent()) {
+            RentalRecord record = rentalRecordRepository.getReferenceById(id);
+            record.getCar().setInUse(true);
+            record.getCar().setIsReserved(false);
+            record.setCollectionDate(LocalDateTime.now());
+            return ResponseEntity.accepted().body("Success: Car is booked in use");
+        }
+        else{
+            return ResponseEntity.unprocessableEntity().body("Record not found");
         }
     }
 

@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/reservation")
+@RequestMapping
 public class ReservationController {
     private ReservationService reservationService;
 
@@ -17,9 +17,14 @@ public class ReservationController {
     public ReservationController(ReservationService reservationService) {
         this.reservationService = reservationService;
     }
-    @PostMapping("/add")
+    @PostMapping("/reserve")
     public ResponseEntity<Object> addReservation(@RequestBody final Reservation record) {
         return reservationService.addReservation(record);
+    }
+
+    @PostMapping("/book/{id}")
+    public ResponseEntity<Object> addBooking(@RequestBody final Long id) {
+        return reservationService.addBooking(id);
     }
 
     @DeleteMapping("/checkout/{id}")
