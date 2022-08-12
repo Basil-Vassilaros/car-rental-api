@@ -13,6 +13,7 @@ Project Presentation Date: 15 July 2022
 * Test API using Postman
 * Test API using SwaggerUI
 
+-----
 
 * Option to create,read, update & delete Car Category
 * Option to create,read, update & delete Car Models
