@@ -1,11 +1,13 @@
 package com.sisekelo.carrentalapi.services;
 
 import com.sisekelo.carrentalapi.models.Client;
-import com.sisekelo.carrentalapi.models.RentalSchedule;
 import com.sisekelo.carrentalapi.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 public class ClientService {
@@ -16,14 +18,8 @@ public class ClientService {
         this.clientRepository = clientRepository;
     }
 
-    public ResponseEntity<Object> addClient(Client client) {
-        Client savedClient = clientRepository.save(client);
-        if(clientRepository.findById(savedClient.getClientId()).isPresent()){
-            return ResponseEntity.accepted().body("Successfully created Record");
-        }
-        else {
-            return ResponseEntity.unprocessableEntity().body("Failed to Create specified record");
-        }
+    public Client addClient(Client client) {
+        return clientRepository.save(client);
     }
 
     public ResponseEntity<Object> deleteClient (Long id) {
@@ -39,5 +35,26 @@ public class ClientService {
         else{
             return ResponseEntity.unprocessableEntity().body("No Record Found");
         }
+    }
+
+    public Client getClient(Long id){
+        return clientRepository.getReferenceById(id);
+    }
+
+    public List<Client> getAllClient(){
+        return clientRepository.findAll();
+    }
+
+    @Transactional
+    public Client updateClientById(Long id, Client client){
+        Client updatedClient = clientRepository.getReferenceById(id);
+
+        updatedClient.setEmailAddress(client.getEmailAddress());
+        updatedClient.setFirstName(client.getFirstName());
+        updatedClient.setLastName(client.getLastName());
+        updatedClient.setHomeAddress(client.getHomeAddress());
+        updatedClient.setMobileNumber(client.getMobileNumber());
+
+        return updatedClient;
     }
 }
