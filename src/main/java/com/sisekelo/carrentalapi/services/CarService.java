@@ -1,9 +1,9 @@
 package com.sisekelo.carrentalapi.services;
 
 import com.sisekelo.carrentalapi.models.Car;
-import com.sisekelo.carrentalapi.models.Client;
-import com.sisekelo.carrentalapi.models.Car;
+import com.sisekelo.carrentalapi.models.RentalRecord;
 import com.sisekelo.carrentalapi.repository.CarRepository;
+import com.sisekelo.carrentalapi.repository.RentalRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,10 +15,12 @@ import java.util.List;
 @Service
 public class CarService {
     private final CarRepository carRepository;
+    private RentalRecordRepository rentalRecordRepository;
 
     @Autowired
-    public CarService(CarRepository carRepository) {
+    public CarService(CarRepository carRepository, RentalRecordRepository rentalRecordRepository) {
         this.carRepository = carRepository;
+        this.rentalRecordRepository = rentalRecordRepository;
     }
 
     public Car addCar(Car car){
@@ -28,17 +30,33 @@ public class CarService {
     }
 
     public ResponseEntity<Object> deleteCar (Long id) {
-        if(carRepository.findById(id).isPresent()){
-            carRepository.deleteById(id);
-            if(carRepository.findById(id).isPresent()){
-                return ResponseEntity.unprocessableEntity().body("Failed to delete the specific car");
+        if (carRepository.findById(id).isPresent()) {
+            /*
+                If the Car that I wish to delete is referenced to a Rental Record
+                then I cannot delete the Car until it no longer is referenced
+            */
+            Boolean isReferenced = false;
+            List<RentalRecord> listToReference = rentalRecordRepository.findAll();// the list to see if there are any references
+            List<Long> referenceExistList = new ArrayList<Long>();// a list to save the IDs of the entities referencing
+            Car reference = carRepository.findById(id).get();// the entity I want to delete
+            for (RentalRecord toReference : listToReference) {
+                if (toReference.getCar() == reference) {
+                    isReferenced = true;
+                    referenceExistList.add(toReference.getRentalId());
+                }
             }
-            else {
-                return ResponseEntity.ok().body("Successfully deleted specific car");
+            if (!isReferenced) {
+                carRepository.deleteById(id);
+            } else {
+                return ResponseEntity.unprocessableEntity().body("Failed to delete car: Reference to Rental Record (" + referenceExistList + ")");
             }
-        }
-        else{
-            return ResponseEntity.unprocessableEntity().body("No Car Found");
+            if (carRepository.findById(id).isPresent()) {
+                return ResponseEntity.unprocessableEntity().body("Failed to delete car: Unknown");
+            } else {
+                return ResponseEntity.ok().body("Success: deleted car");
+            }
+        } else {
+            return ResponseEntity.unprocessableEntity().body("Car not found");
         }
     }
 

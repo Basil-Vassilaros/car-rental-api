@@ -1,34 +1,32 @@
 package com.sisekelo.carrentalapi.services;
 
-import com.sisekelo.carrentalapi.models.RentalSchedule;
+import com.sisekelo.carrentalapi.models.RentalRecord;
 import com.sisekelo.carrentalapi.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 
 @Service
-public class RentalScheduleService {
+public class RentalRecordService {
     private CarCategoryRepository carCategoryRepository;
     private CarModelRepository carModelRepository;
     private CarRepository carRepository;
     private ClientRepository clientRepository;
-    private final RentalScheduleRepository rentalScheduleRepository;
+    private final RentalRecordRepository rentalRecordRepository;
 
     @Autowired
-    public RentalScheduleService(CarCategoryRepository carCategoryRepository, CarModelRepository carModelRepository,
-                                 CarRepository carRepository, ClientRepository clientRepository,
-                                 RentalScheduleRepository rentalScheduleRepository) {
+    public RentalRecordService(CarCategoryRepository carCategoryRepository, CarModelRepository carModelRepository,
+                               CarRepository carRepository, ClientRepository clientRepository,
+                               RentalRecordRepository rentalRecordRepository) {
         this.carCategoryRepository = carCategoryRepository;
         this.carModelRepository = carModelRepository;
         this.carRepository = carRepository;
         this.clientRepository = clientRepository;
-        this.rentalScheduleRepository = rentalScheduleRepository;
+        this.rentalRecordRepository = rentalRecordRepository;
     }
 
     public float getTotalPrice(Float price, Date returnDate, Date reserveDate){
@@ -38,13 +36,12 @@ public class RentalScheduleService {
         return totalPrice * diffInDays;
     }
 
-    public ResponseEntity<Object> addRentalRecord(RentalSchedule record) {
-        carRepository.getReferenceById(record.getCar().getCarId()).setIsReserved(true);
+    public ResponseEntity<Object> addRentalRecord(RentalRecord record) {
         record.setReservationDate(new Date());
         record.setTotalPrice(getTotalPrice(record.getCar().getPrice(), record.getReturnDate(),
                 record.getReservationDate()));
-        RentalSchedule savedRecord = rentalScheduleRepository.save(record);
-        if(rentalScheduleRepository.findById(savedRecord.getRentalId()).isPresent()){
+        RentalRecord savedRecord = rentalRecordRepository.save(record);
+        if(rentalRecordRepository.findById(savedRecord.getRentalId()).isPresent()){
             return ResponseEntity.accepted().body("Successfully created Record");
         }
         else {
@@ -53,12 +50,10 @@ public class RentalScheduleService {
     }
 
     public ResponseEntity<Object> deleteRentalRecord (Long id) {
-        if(rentalScheduleRepository.findById(id).isPresent()){
-            RentalSchedule record = rentalScheduleRepository.getReferenceById(id);
-            record.getCar().setIsReserved(false);
-            record.getCar().setInUse(false);
-            rentalScheduleRepository.deleteById(id);
-            if(rentalScheduleRepository.findById(id).isPresent()){
+        if(rentalRecordRepository.findById(id).isPresent()){
+            RentalRecord record = rentalRecordRepository.getReferenceById(id);
+            rentalRecordRepository.deleteById(id);
+            if(rentalRecordRepository.findById(id).isPresent()){
                 return ResponseEntity.unprocessableEntity().body("Failed to delete the specific record");
             }
             else {
@@ -70,9 +65,9 @@ public class RentalScheduleService {
         }
     }
 
-    public RentalSchedule getRentalRecord(Long id){
-        if(rentalScheduleRepository.findById(id).isPresent()){
-            RentalSchedule record = rentalScheduleRepository.findById(id).get();
+    public RentalRecord getRentalRecord(Long id){
+        if(rentalRecordRepository.findById(id).isPresent()){
+            RentalRecord record = rentalRecordRepository.findById(id).get();
             return record;
         }
         else{
@@ -80,22 +75,22 @@ public class RentalScheduleService {
         }
     }
 
-    public List<RentalSchedule> getAllRentalRecord(){
-        List<RentalSchedule> records = rentalScheduleRepository.findAll();
+    public List<RentalRecord> getAllRentalRecord(){
+        List<RentalRecord> records = rentalRecordRepository.findAll();
         return records;
     }
 
-    public RentalSchedule deleteRecordById (Long id) {
-        RentalSchedule record = rentalScheduleRepository.getReferenceById(id);
+    public RentalRecord deleteRecordById (Long id) {
+        RentalRecord record = rentalRecordRepository.getReferenceById(id);
         record.getCar().setIsReserved(false);
         record.getCar().setInUse(false);
-        rentalScheduleRepository.delete(record);
+        rentalRecordRepository.delete(record);
         return record;
     }
 
     @Transactional
-    public RentalSchedule updateRecordById(Long id, RentalSchedule record){
-        RentalSchedule updatedRecord = rentalScheduleRepository.getReferenceById(id);
+    public RentalRecord updateRecordById(Long id, RentalRecord record){
+        RentalRecord updatedRecord = rentalRecordRepository.getReferenceById(id);
         updatedRecord.setCar(record.getCar());
         updatedRecord.setClient(record.getClient());
         updatedRecord.setCollectionDate(record.getCollectionDate());
