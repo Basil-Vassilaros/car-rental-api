@@ -3,6 +3,7 @@ package com.sisekelo.carrentalapi.models;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -19,10 +20,13 @@ public class Reservation {
     @Column(nullable = false)
     private Long clientId;
 
-    @Column(nullable = false)
-    private Date collectionDate;
+    @Column(nullable = false, columnDefinition = "TIMESTAMP")
+    private LocalDateTime reservationDate;
 
-    @Column(nullable = false)
-    private Date returnDate;
+    @Column(nullable = false, columnDefinition = "TIMESTAMP")
+    private LocalDateTime collectionDate;
+
+    @Column(nullable = false, columnDefinition = "TIMESTAMP")
+    private LocalDateTime returnDate;
 
 }
