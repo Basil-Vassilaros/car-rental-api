@@ -3,13 +3,12 @@ package com.sisekelo.carrentalapi.models;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.Currency;
 import java.util.Date;
 
 @Entity
 @Data
 @Table(name = "RentalSchedule")
-public class RentalSchedule {
+public class RentalRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
