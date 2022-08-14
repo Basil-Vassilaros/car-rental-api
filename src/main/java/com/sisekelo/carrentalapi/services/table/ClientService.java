@@ -1,7 +1,7 @@
-package com.sisekelo.carrentalapi.services;
+package com.sisekelo.carrentalapi.services.table;
 
-import com.sisekelo.carrentalapi.models.Client;
-import com.sisekelo.carrentalapi.models.RentalRecord;
+import com.sisekelo.carrentalapi.models.tables.Client;
+import com.sisekelo.carrentalapi.models.tables.RentalRecord;
 import com.sisekelo.carrentalapi.repository.ClientRepository;
 import com.sisekelo.carrentalapi.repository.RentalRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;

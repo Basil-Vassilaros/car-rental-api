@@ -1,14 +1,9 @@
 package com.sisekelo.carrentalapi.models.dto;
 
-import com.sisekelo.carrentalapi.models.Car;
-import com.sisekelo.carrentalapi.models.CarCategory;
-import com.sisekelo.carrentalapi.models.CarModel;
+import com.sisekelo.carrentalapi.models.tables.Car;
+import com.sisekelo.carrentalapi.models.tables.CarCategory;
+import com.sisekelo.carrentalapi.models.tables.CarModel;
 import lombok.Data;
-
-import java.util.ArrayList;
-import java.util.Currency;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 public class CarDto {

@@ -1,6 +1,6 @@
 package com.sisekelo.carrentalapi.repository;
 
-import com.sisekelo.carrentalapi.models.Client;
+import com.sisekelo.carrentalapi.models.tables.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

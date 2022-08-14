@@ -1,7 +1,6 @@
-package com.sisekelo.carrentalapi.models;
+package com.sisekelo.carrentalapi.models.tables;
 
 import com.sisekelo.carrentalapi.models.dto.CarManufacturerDto;
-import com.sisekelo.carrentalapi.models.dto.CarModelDto;
 import lombok.Data;
 
 import javax.persistence.*;

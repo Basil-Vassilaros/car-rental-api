@@ -1,12 +1,7 @@
 package com.sisekelo.carrentalapi.models.dto;
 
-import com.sisekelo.carrentalapi.models.CarManufacturer;
+import com.sisekelo.carrentalapi.models.tables.CarManufacturer;
 import lombok.Data;
-
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 @Data
 public class CarManufacturerDto {

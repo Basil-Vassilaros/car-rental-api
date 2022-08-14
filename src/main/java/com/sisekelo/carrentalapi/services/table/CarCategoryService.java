@@ -1,9 +1,7 @@
-package com.sisekelo.carrentalapi.services;
+package com.sisekelo.carrentalapi.services.table;
 
-import com.sisekelo.carrentalapi.models.Car;
-import com.sisekelo.carrentalapi.models.CarCategory;
-import com.sisekelo.carrentalapi.models.CarManufacturer;
-import com.sisekelo.carrentalapi.models.CarModel;
+import com.sisekelo.carrentalapi.models.tables.Car;
+import com.sisekelo.carrentalapi.models.tables.CarCategory;
 import com.sisekelo.carrentalapi.repository.CarCategoryRepository;
 import com.sisekelo.carrentalapi.repository.CarRepository;
 import org.springframework.beans.factory.annotation.Autowired;

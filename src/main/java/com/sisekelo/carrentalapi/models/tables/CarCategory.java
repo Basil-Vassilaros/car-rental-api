@@ -1,4 +1,4 @@
-package com.sisekelo.carrentalapi.models;
+package com.sisekelo.carrentalapi.models.tables;
 
 import lombok.Data;
 

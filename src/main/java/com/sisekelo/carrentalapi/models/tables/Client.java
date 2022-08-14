@@ -1,9 +1,9 @@
-package com.sisekelo.carrentalapi.models;
+package com.sisekelo.carrentalapi.models.tables;
 
+import com.sisekelo.carrentalapi.models.tables.Car;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Data
