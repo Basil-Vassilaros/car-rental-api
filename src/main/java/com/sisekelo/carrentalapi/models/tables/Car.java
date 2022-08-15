@@ -20,10 +20,6 @@ public class Car {
     @JoinColumn(name = "modelId", nullable = false)
     private CarModel carModel;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "categoryId", nullable = false)
-    private CarCategory carCategory;
-
     @Column(nullable = false)
     private Float price;
 
@@ -33,7 +29,10 @@ public class Car {
     @Column(nullable = false)
     private Boolean inUse;
 
-    private List<String> reservedDates;
+    @Column(nullable = false)
+    private String color;
+
+    //private List<String> reservedDates;
     public static Car from(CarDto carDto){
         Car car = new Car();
 		car.setRegistrationNumber(carDto.getRegistrationNumber());

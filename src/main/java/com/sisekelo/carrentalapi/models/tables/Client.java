@@ -1,6 +1,5 @@
 package com.sisekelo.carrentalapi.models.tables;
 
-import com.sisekelo.carrentalapi.models.tables.Car;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -24,7 +23,5 @@ public class Client {
 
     private String homeAddress;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "carId", nullable = false)
-    private Car carsReserved;
+    private Long carsReserved;
 }

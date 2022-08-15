@@ -18,11 +18,17 @@ public class CarModel {
     @JoinColumn(name="manufacturerId",nullable = false)
     private CarManufacturer carManufacturer;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="categoryId",nullable = false)
+    private CarCategory carCategory;
+
     @Column(nullable = false)
     private String carModel;
 
     @Column(nullable = false)
     private String year;
+
+
 
     public static CarModel from(CarModelDto carModelDto){
         CarModel model = new CarModel();

@@ -13,4 +13,11 @@
   <component name="ProjectType">
     <option name="id" value="jpab" />
   </component>
+  <component name="SuppressABINotification">
+    <option name="modulesWithSuppressedNotConfigured">
+      <set>
+        <option value="car-rental-api" />
+      </set>
+    </option>
+  </component>
 </project>

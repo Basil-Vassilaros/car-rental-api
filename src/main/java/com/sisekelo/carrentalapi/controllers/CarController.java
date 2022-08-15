@@ -65,51 +65,34 @@ public class CarController {
     }
 
     //Get all available car by ModelId
-    @GetMapping("/all/available/{id}")
-    public ResponseEntity<List<Car>> getAllAvailableCars(@PathVariable final Long id) {
-        if(id.toString() != ""){
-            if (carModelRepository.findById(id).isPresent()){
-                return new ResponseEntity<>(carService.getAllAvailableCarsByModel(id), HttpStatus.OK);
-            }
-            else{
-                return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-            }
-        }
-        else{
-            return new ResponseEntity<>(carService.getAllAvailableCars(), HttpStatus.OK);
-        }
+    @GetMapping("/all/booked/")
+    public ResponseEntity<List<Car>> getAllBookedCars() {
+        return new ResponseEntity<>(carService.getAllBookedCars(), HttpStatus.OK);
+    }
+
+    @GetMapping("/all/booked/{id}")
+    public ResponseEntity<List<Car>> getAllBookedCarsByModel(@PathVariable final Long id) {
+        return new ResponseEntity<>(carService.getAllBookedCarsByModel(id), HttpStatus.OK);
     }
 
     //get all reserved cars by ModelId
+    @GetMapping("/all/available/{id}")
+    public ResponseEntity<List<Car>> getAllAvailableCarsByModel(@PathVariable final Long id) {
+        return new ResponseEntity<>(carService.getAllAvailableCarsByModel(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/all/available/")
+    public ResponseEntity<List<Car>> getAllAvailableCars() {
+        return new ResponseEntity<>(carService.getAllAvailableCars(), HttpStatus.OK);
+    }
+
     @GetMapping("/all/reserved/{id}")
-    public ResponseEntity<List<Car>> getAllReservedCars(@PathVariable final Long id) {
-        if(id.toString() != ""){
-            if (carModelRepository.findById(id).isPresent()){
-                return new ResponseEntity<>(carService.getAllReservedCarsByModel(id), HttpStatus.OK);
-            }
-            else{
-                return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-            }
-        }
-        else{
-            return new ResponseEntity<>(carService.getAllReservedCars(), HttpStatus.OK);
-        }
+    public ResponseEntity<List<Car>> getAllReservedCarsByModel(@PathVariable final Long id) {
+        return new ResponseEntity<>(carService.getAllReservedCarsByModel(id), HttpStatus.OK);
     }
 
-    //get all booked cars by ModelId
-    @GetMapping("/all/booked/{id}")
-    public ResponseEntity<List<Car>> getAllBookedCars(@PathVariable final Long id) {
-        if(id.toString() != ""){
-            if (carModelRepository.findById(id).isPresent()){
-                return new ResponseEntity<>(carService.getAllBookedCarsByModel(id), HttpStatus.OK);
-            }
-            else{
-                return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-            }
-        }
-        else{
-            return new ResponseEntity<>(carService.getAllBookedCars(), HttpStatus.OK);
-        }
+    @GetMapping("/all/reserved/")
+    public ResponseEntity<List<Car>> getAllReservedCars() {
+        return new ResponseEntity<>(carService.getAllReservedCars(), HttpStatus.OK);
     }
-
 }

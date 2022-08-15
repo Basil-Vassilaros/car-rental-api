@@ -14,8 +14,7 @@ public class CarResponse {
 
         private Long modelId;
 
-        private Long categoryId;
-
         private Float price;
 
+        private String color;
 }

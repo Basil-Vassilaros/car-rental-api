@@ -40,12 +40,12 @@ public class CarModelController {
     }
 
     @GetMapping("/details/{id}")
-    public ResponseEntity<CarModel> getModel(@PathVariable Long id) {
+    public ResponseEntity<?> getModel(@PathVariable Long id) {
         if (carModelRepository.findById(id).isPresent()){
             return new ResponseEntity<>(carModelRepository.getReferenceById(id), HttpStatus.OK);
         }
         else{
-            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+            return ResponseEntity.unprocessableEntity().body("Model not found");
         }
     }
 

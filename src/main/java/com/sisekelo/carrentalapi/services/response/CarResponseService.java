@@ -35,28 +35,22 @@ public class CarResponseService {
     public ResponseEntity<Object> addCar(CarResponse car){
         Car newCar = new Car();
         missing = false;
-        if (!carCategoryRepository.findById(car.getCategoryId()).isPresent()){
-            missing = true;
-            return ResponseEntity.unprocessableEntity().body("Error: Referenced Car Category not found");
-        }
         if (!carModelRepository.findById(car.getModelId()).isPresent()){
             missing = true;
             return ResponseEntity.unprocessableEntity().body("Error: Referenced Car Model not found");
         }
         if (!missing){
-            newCar.setCarCategory(carCategoryRepository.getReferenceById(car.getCategoryId()));
             newCar.setCarModel(carModelRepository.getReferenceById(car.getModelId()));
             newCar.setPrice(car.getPrice());
             newCar.setRegistrationNumber(car.getRegistrationNumber());
             newCar.setInUse(false);
             newCar.setIsReserved(false);
+            newCar.setColor(car.getColor());
             carRepository.save(newCar);
-        }
-        if(carRepository.findById(newCar.getCarId()).isPresent()){
             return ResponseEntity.accepted().body("Success: Car saved");
         }
-        else {
-            return ResponseEntity.unprocessableEntity().body("Error: Failed to save Car");
+        else{
+            return ResponseEntity.unprocessableEntity().body("Error: Car not saved");
         }
     }
 
@@ -95,19 +89,16 @@ public class CarResponseService {
         if (carRepository.findById(id).isPresent()) {
             Car updateCar = carRepository.getReferenceById(id);
             missing = false;
-            if (!carCategoryRepository.findById(car.getCategoryId()).isPresent()) {
-                missing = true;
-                return ResponseEntity.unprocessableEntity().body("Error: Referenced Car Category not found");
-            }
             if (!carModelRepository.findById(car.getModelId()).isPresent()) {
                 missing = true;
                 return ResponseEntity.unprocessableEntity().body("Error: Referenced Car Model not found");
             }
             if (!missing) {
-                updateCar.setCarCategory(carCategoryRepository.getReferenceById(car.getCategoryId()));
                 updateCar.setCarModel(carModelRepository.getReferenceById(car.getModelId()));
                 updateCar.setPrice(car.getPrice());
                 updateCar.setRegistrationNumber(car.getRegistrationNumber());
+                updateCar.setColor(car.getColor());
+
                 return ResponseEntity.accepted().body("Success: Car updated");
             }
             else{

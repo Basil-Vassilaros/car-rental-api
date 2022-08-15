@@ -1,6 +1,7 @@
 package com.sisekelo.carrentalapi.controllers;
 
 import com.sisekelo.carrentalapi.models.tables.CarManufacturer;
+import com.sisekelo.carrentalapi.repository.CarManufacturerRepository;
 import com.sisekelo.carrentalapi.services.table.CarManufacturerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,10 +14,12 @@ import java.util.List;
 @RequestMapping("/manufacturer")
 public class CarManufacturerController {
     private CarManufacturerService carManufacturerService;
+    private CarManufacturerRepository carManufacturerRepository;
 
     @Autowired
-    public CarManufacturerController(CarManufacturerService carManufacturerService) {
+    public CarManufacturerController(CarManufacturerService carManufacturerService, CarManufacturerRepository carManufacturerRepository) {
         this.carManufacturerService = carManufacturerService;
+        this.carManufacturerRepository = carManufacturerRepository;
     }
 
     @PostMapping("/add")
@@ -36,12 +39,17 @@ public class CarManufacturerController {
     }
 
     @GetMapping("/details/{id}")
-    public ResponseEntity<CarManufacturer> getManufacturer(@PathVariable Long id) {
-        return new ResponseEntity<>(carManufacturerService.getManufacturer(id), HttpStatus.OK);
+    public ResponseEntity<?> getManufacturer(@PathVariable Long id) {
+        if (carManufacturerRepository.findById(id).isPresent()){
+            return new ResponseEntity<>(carManufacturerRepository.getReferenceById(id), HttpStatus.OK);
+        }
+        else {
+            return ResponseEntity.unprocessableEntity().body("Manufacturer not found");
+        }
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<CarManufacturer>> getAllManufacturer() {
-        return new ResponseEntity<>(carManufacturerService.getAllManufacturer(), HttpStatus.OK);
+        return new ResponseEntity<>(carManufacturerRepository.findAll(), HttpStatus.OK);
     }
 }

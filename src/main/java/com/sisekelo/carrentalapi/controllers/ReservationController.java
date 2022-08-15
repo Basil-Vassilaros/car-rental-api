@@ -42,8 +42,13 @@ public class ReservationController {
         return reservationService.updateRecordByClient(id, record);
     }
     @GetMapping("/details/{id}")
-    public ResponseEntity<RentalRecord> getRentalRecord(@PathVariable Long id) {
-        return new ResponseEntity<>(rentalRecordRepository.getReferenceById(id), HttpStatus.OK);
+    public ResponseEntity<?> getRentalRecord(@PathVariable Long id) {
+        if (rentalRecordRepository.findById(id).isPresent()){
+            return new ResponseEntity<>(rentalRecordRepository.getReferenceById(id), HttpStatus.OK);
+        }
+        else{
+            return ResponseEntity.unprocessableEntity().body("Record not found");
+        }
     }
 
     @GetMapping("/all")

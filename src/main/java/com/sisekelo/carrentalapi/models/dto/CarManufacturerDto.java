@@ -8,10 +8,4 @@ public class CarManufacturerDto {
     private Long manufacturerId;
 
     private String manufacturer;
-
-    public static CarManufacturerDto from(CarManufacturer manufacturer){
-        CarManufacturerDto manufacturerDto = new CarManufacturerDto();
-        manufacturerDto.setManufacturer(manufacturer.getManufacturer());
-        return manufacturerDto;
-    }
 }

@@ -16,10 +16,4 @@ public class CarManufacturer {
 
     @Column(nullable = false)
     private String manufacturer;
-
-    public static CarManufacturer from(CarManufacturerDto manufacturerDto){
-        CarManufacturer manufacturer = new CarManufacturer();
-        manufacturer.setManufacturer(manufacturerDto.getManufacturer());
-        return manufacturer;
-    }
 }

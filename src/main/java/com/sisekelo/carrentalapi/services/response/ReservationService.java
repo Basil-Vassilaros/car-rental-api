@@ -52,27 +52,27 @@ public class ReservationService {
             missing = true;
             return ResponseEntity.unprocessableEntity().body("Error: Referenced Client not found");
         }
-        if (!missing){
+        if (!missing) {
             // Check if car is booked for dates reserved
             List<RentalRecord> recordList = rentalRecordRepository.findAll();
-            for (RentalRecord record: recordList) {
+            for (RentalRecord record : recordList) {
                 // cant be booked before return and cant be returned after booked
                 if (reservation.getDateToCollect().isBefore(record.getDateToReturn()) ||
-                reservation.getDateToReturn().isAfter(record.getDateToCollect())){
+                        reservation.getDateToReturn().isAfter(record.getDateToCollect())) {
                     problem = true;
                     return ResponseEntity.unprocessableEntity().body("Error: Car is already booked between"
-                            +record.getDateToCollect().toString()+" and "+record.getDateToReturn().toString());
+                            + record.getDateToCollect().toString() + " and " + record.getDateToReturn().toString());
                 }
-                if (record.getClient().getClientId() == reservation.getClientId()){
+                if (record.getClient().getClientId() == reservation.getClientId()) {
                     problem = true;
-                    return ResponseEntity.unprocessableEntity().body("Error: Client has already made a reservation ("+record.getRentalId()+")");
+                    return ResponseEntity.unprocessableEntity().body("Error: Client has already made a reservation (" + record.getRentalId() + ")");
                 }
             }
-            if (reservation.getDateToReturn().isBefore(reservation.getDateToCollect())){
+            if (reservation.getDateToReturn().isBefore(reservation.getDateToCollect())) {
                 problem = true;
                 return ResponseEntity.unprocessableEntity().body("Error: Return date must be after collection date");
             }
-            if (!problem){
+            if (!problem) {
                 newRecord.setCar(carRepository.getReferenceById(reservation.getCarId()));
 
                 newRecord.setClient(clientRepository.getReferenceById(reservation.getClientId()));
@@ -86,25 +86,24 @@ public class ReservationService {
                 Car carReserved = carRepository.getReferenceById(reservation.getCarId());
 
                 carReserved.setIsReserved(true);
-
+/*
                 List<String> reservedDates = carReserved.getReservedDates();
                 reservedDates.add(reservation.getDateToCollect().toString()+" - "
                         +reservation.getDateToReturn().toString());
                 carReserved.setReservedDates(reservedDates);
-
-                clientRepository.getReferenceById(reservation.getClientId()).setCarsReserved(carReserved);
+*/
+                clientRepository.getReferenceById(reservation.getClientId()).setCarsReserved(reservation.getCarId());
 
                 newRecord.setTotalPrice(rentalRecordService.getTotalPrice(newRecord.getCar().getPrice(), newRecord.getDateToReturn(),
                         newRecord.getDateToCollect()));
 
                 rentalRecordRepository.save(newRecord);
+                return ResponseEntity.accepted().body("Success: Record saved");
+            } else {
+                return ResponseEntity.unprocessableEntity().body("Error: Record not saved");
             }
-        }
-        if(rentalRecordRepository.findById(newRecord.getRentalId()).isPresent()){
-            return ResponseEntity.accepted().body("Success: recorded reservation");
-        }
-        else {
-            return ResponseEntity.unprocessableEntity().body("Error: Failed to record reservation");
+        }else {
+            return ResponseEntity.unprocessableEntity().body("Error: Record not saved");
         }
     }
 
@@ -168,22 +167,22 @@ public class ReservationService {
                             updatedRecord.getDateToCollect()));
                     Car carReserved = carRepository.getReferenceById(reservation.getCarId());
                     carReserved.setIsReserved(true);
-                    List<String> reservedDates = carReserved.getReservedDates();
+                   /* List<String> reservedDates = carReserved.getReservedDates();
                     String dateToRemove = updatedRecord.getDateToCollect().toString()+" - "
                             +updatedRecord.getDateToReturn().toString();
                     if (reservedDates.contains(dateToRemove)) {
                         int removeId = reservedDates.indexOf(dateToRemove);
                         reservedDates.remove(removeId);
                     }
-
+*/
                     updatedRecord.setDateToReturn(reservation.getDateToReturn());
                     updatedRecord.setDateToCollect(reservation.getDateToCollect());
-
+/*
                     reservedDates.add(reservation.getDateToCollect().toString()+" - "
                             +reservation.getDateToReturn().toString());
                     carReserved.setReservedDates(reservedDates);
-
-                    clientRepository.getReferenceById(reservation.getClientId()).setCarsReserved(carReserved);
+*/
+                    clientRepository.getReferenceById(reservation.getClientId()).setCarsReserved(reservation.getCarId());
                     return ResponseEntity.accepted().body("Success: record updated");
                 }
                 else{
@@ -213,16 +212,16 @@ public class ReservationService {
             }
             if (recordId.toString() != ""){
                 RentalRecord recordToDelete = rentalRecordRepository.getReferenceById(recordId);
-                recordToDelete.getClient().setCarsReserved(new Car());
+                recordToDelete.getClient().setCarsReserved(null);
                 recordToDelete.getCar().setIsReserved(false);
                 recordToDelete.getCar().setInUse(false);
-                List<String> reservedDates = recordToDelete.getCar().getReservedDates();
+              /*  List<String> reservedDates = recordToDelete.getCar().getReservedDates();
                 String dateToRemove = recordToDelete.getDateToCollect().toString()+" - "
                         +recordToDelete.getDateToReturn().toString();
                 if (reservedDates.contains(dateToRemove)) {
                     int removeId = reservedDates.indexOf(dateToRemove);
                     reservedDates.remove(removeId);
-                }
+                }*/
                 rentalRecordRepository.deleteById(id);
                 if(!rentalRecordRepository.findById(id).isPresent()){
                     return ResponseEntity.accepted().body("Success: Reservation checked out");

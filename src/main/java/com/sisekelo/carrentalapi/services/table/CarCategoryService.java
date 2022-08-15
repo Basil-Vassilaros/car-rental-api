@@ -2,7 +2,9 @@ package com.sisekelo.carrentalapi.services.table;
 
 import com.sisekelo.carrentalapi.models.tables.Car;
 import com.sisekelo.carrentalapi.models.tables.CarCategory;
+import com.sisekelo.carrentalapi.models.tables.CarModel;
 import com.sisekelo.carrentalapi.repository.CarCategoryRepository;
+import com.sisekelo.carrentalapi.repository.CarModelRepository;
 import com.sisekelo.carrentalapi.repository.CarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +17,12 @@ import java.util.List;
 @Service
 public class CarCategoryService {
     private CarCategoryRepository carCategoryRepository;
-    private CarRepository carRepository;
+    private CarModelRepository carModelRepository;
 
     @Autowired
-    public CarCategoryService(CarCategoryRepository carCategoryRepository, CarRepository carRepository) {
+    public CarCategoryService(CarCategoryRepository carCategoryRepository, CarModelRepository carModelRepository) {
         this.carCategoryRepository = carCategoryRepository;
-        this.carRepository = carRepository;
+        this.carModelRepository = carModelRepository;
     }
 
     public CarCategory addCategory(CarCategory carCategory){
@@ -51,13 +53,13 @@ public class CarCategoryService {
                 then I cannot delete the Car Category until it no longer is referenced
             */
             Boolean isReferenced = false;
-            List<Car> listToReference = carRepository.findAll();// the list to see if there are any references
+            List<CarModel> listToReference = carModelRepository.findAll();// the list to see if there are any references
             List<Long> referenceExistList = new ArrayList<Long>();// a list to save the IDs of the entities referencing
             CarCategory reference = carCategoryRepository.findById(id).get();// the entity I want to delete
-            for (Car toReference : listToReference) {
+            for (CarModel toReference : listToReference) {
                 if (toReference.getCarCategory() == reference) {
                     isReferenced = true;
-                    referenceExistList.add(toReference.getCarId());
+                    referenceExistList.add(toReference.getModelId());
                 }
             }
             if (!isReferenced) {

@@ -13,8 +13,6 @@ public class Reservation {
 
     private Long clientId;
 
-    private LocalDateTime dateReservationMade;
-
     private LocalDateTime dateToCollect;
 
     private LocalDateTime dateToReturn;
