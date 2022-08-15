@@ -1,7 +1,7 @@
 package com.sisekelo.carrentalapi.controllers;
 
-import com.sisekelo.carrentalapi.models.CarCategory;
-import com.sisekelo.carrentalapi.services.CarCategoryService;
+import com.sisekelo.carrentalapi.models.tables.CarCategory;
+import com.sisekelo.carrentalapi.services.table.CarCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,12 +24,12 @@ public class CarCategoryController {
         return new ResponseEntity<>(carCategoryService.addCategory(carCategory), HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteCategory(@PathVariable final Long id){
         return carCategoryService.deleteCategory(id);
     }
 
-    @PutMapping(value = "{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<CarCategory> updateCategory(@PathVariable final Long id, @RequestBody final CarCategory category){
         CarCategory updatedCategory = carCategoryService.updateCategoryById(id, category);
         return new ResponseEntity<>(updatedCategory, HttpStatus.OK);

@@ -1,10 +1,11 @@
-package com.sisekelo.carrentalapi.models;
+package com.sisekelo.carrentalapi.models.tables;
 
 import com.sisekelo.carrentalapi.models.dto.CarDto;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.Currency;
+import java.util.List;
+
 @Entity
 @Data
 @Table(name = "Car")
@@ -31,7 +32,8 @@ public class Car {
 
     @Column(nullable = false)
     private Boolean inUse;
-	
+
+    private List<String> reservedDates;
     public static Car from(CarDto carDto){
         Car car = new Car();
 		car.setRegistrationNumber(carDto.getRegistrationNumber());

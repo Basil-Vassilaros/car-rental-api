@@ -1,8 +1,7 @@
 package com.sisekelo.carrentalapi.controllers;
 
-import com.sisekelo.carrentalapi.models.Client;
-import com.sisekelo.carrentalapi.models.CarModel;
-import com.sisekelo.carrentalapi.services.ClientService;
+import com.sisekelo.carrentalapi.models.tables.Client;
+import com.sisekelo.carrentalapi.services.table.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +29,7 @@ public class ClientController {
         return clientService.deleteClient(id);
     }
 
-    @PutMapping(value = "{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Client> updateClient(@PathVariable final Long id, @RequestBody final Client client){
         Client updatedClient = clientService.updateClientById(id, client);
         return new ResponseEntity<>(updatedClient, HttpStatus.OK);

@@ -1,9 +1,7 @@
 package com.sisekelo.carrentalapi.models.dto;
 
-import com.sisekelo.carrentalapi.models.Car;
+import com.sisekelo.carrentalapi.models.tables.Car;
 import lombok.Data;
-
-import javax.persistence.*;
 
 @Data
 public class ClientDto {

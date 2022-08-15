@@ -1,6 +1,5 @@
 # Car Rental Project
 Project Date: 1 July 2022 
-
 Project Presentation Date: 15 July 2022
 
 ## Instructions

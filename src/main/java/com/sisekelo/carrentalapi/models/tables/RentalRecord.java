@@ -1,10 +1,11 @@
-package com.sisekelo.carrentalapi.models;
+package com.sisekelo.carrentalapi.models.tables;
 
+import com.sisekelo.carrentalapi.models.tables.Car;
+import com.sisekelo.carrentalapi.models.tables.Client;
 import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Data
@@ -24,13 +25,13 @@ public class RentalRecord {
     private Client client;
 
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
-    private LocalDateTime reservationDate;
+    private LocalDateTime dateReservationMade;
 
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
-    private LocalDateTime collectionDate;
+    private LocalDateTime dateToCollect;
 
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
-    private LocalDateTime returnDate;
+    private LocalDateTime dateToReturn;
 
     @Column(nullable = false)
     private Float totalPrice;
