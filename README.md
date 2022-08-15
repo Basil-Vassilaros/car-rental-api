@@ -1,12 +1,11 @@
 # Car Rental Project
-Project Date: 1 July 2022
-
+Project Date: 1 July 2022 
 Project Presentation Date: 15 July 2022
 
 ## Instructions
-Create a simple car rental REST API using Java(Springboot), MySQL and Postman (for testing).
-Configure SwaggerUI in your project.
-Utilise 4 basic methods: GET, PUT, POST and DELETE
+  Create a simple car rental REST API using Java(Springboot), MySQL and Postman (for testing).
+  Configure SwaggerUI in your project.
+  Utilise 4 basic methods: GET, PUT, POST and DELETE
 
 ## Features
 * Single user API (admin dashboard)
@@ -29,7 +28,7 @@ Utilise 4 basic methods: GET, PUT, POST and DELETE
 * Option to list booked cars by car model
 
 ## Notes
-Include the price of the car, include the reservation schedule in your car entity
+  Include the price of the car, include the reservation schedule in your car entity
 
-Technologies to use: Java(Springboot), SwaggerUI, Springboot data jpa, Springboot web, Maven, MySQL.
+  Technologies to use: Java(Springboot), SwaggerUI, Springboot data jpa, Springboot web, Maven, MySQL.
 ________________________________________________________
