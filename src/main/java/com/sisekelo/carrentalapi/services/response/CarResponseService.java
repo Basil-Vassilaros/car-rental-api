@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -46,6 +47,7 @@ public class CarResponseService {
             newCar.setInUse(false);
             newCar.setIsReserved(false);
             newCar.setColor(car.getColor());
+            newCar.setReservedDates(new ArrayList<>());
             carRepository.save(newCar);
             return ResponseEntity.accepted().body("Success: Car saved");
         }

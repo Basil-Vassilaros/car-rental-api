@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,9 +30,9 @@ public class RentalRecordService {
         this.rentalRecordRepository = rentalRecordRepository;
     }
 
-    public float getTotalPrice(Float price, LocalDateTime returnDate, LocalDateTime reserveDate){
+    public float getTotalPrice(Float price, LocalDate returnDate, LocalDate reserveDate){
         float totalPrice = price;
-        Long diffInDays = returnDate.toLocalDate().toEpochDay() - reserveDate.toLocalDate().toEpochDay();
+        Long diffInDays = returnDate.toEpochDay() - reserveDate.toEpochDay();
         return totalPrice * diffInDays;
     }
 

@@ -13,7 +13,7 @@ public class Reservation {
 
     private Long clientId;
 
-    private LocalDateTime dateToCollect;
+    private String dateToCollect;
 
-    private LocalDateTime dateToReturn;
+    private String dateToReturn;
 }

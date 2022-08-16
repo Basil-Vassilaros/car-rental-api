@@ -32,7 +32,7 @@ public class Car {
     @Column(nullable = false)
     private String color;
 
-    //private List<String> reservedDates;
+    private List<String> reservedDates;
     public static Car from(CarDto carDto){
         Car car = new Car();
 		car.setRegistrationNumber(carDto.getRegistrationNumber());
