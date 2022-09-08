@@ -4,6 +4,8 @@ import com.sisekelo.carrentalapi.models.dto.CarDto;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Entity
@@ -32,7 +34,8 @@ public class Car {
     @Column(nullable = false)
     private String color;
 
-    private List<String> reservedDates;
+    private String bookedDates;
+
     public static Car from(CarDto carDto){
         Car car = new Car();
 		car.setRegistrationNumber(carDto.getRegistrationNumber());

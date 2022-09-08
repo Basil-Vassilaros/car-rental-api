@@ -5,7 +5,6 @@ import com.sisekelo.carrentalapi.models.tables.Client;
 import com.sisekelo.carrentalapi.models.tables.RentalRecord;
 import com.sisekelo.carrentalapi.repository.ClientRepository;
 import com.sisekelo.carrentalapi.repository.RentalRecordRepository;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 @Service
 public class ClientResponseService {
@@ -35,7 +33,7 @@ public class ClientResponseService {
         newClient.setHomeAddress(client.getHomeAddress());
 
         newClient.setMobileNumber(client.getMobileNumber());
-        newClient.setCarsReserved(null);
+        newClient.setReservedCars("");
         clientRepository.save(newClient);
         return ResponseEntity.accepted().body("Success: Client saved");
     }

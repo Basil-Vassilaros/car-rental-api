@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+@CrossOrigin(origins = "http://localhost:8080")
 
 @RestController
 @RequestMapping("/cars")
@@ -32,20 +33,49 @@ public class CarController {
         this.carModelRepository = carModelRepository;
     }
 
-    //Response Mapping
+    // Response Mapping
+    // Add new Car only If Car exists & If Car Model exists
     @PostMapping("/add")
-    public ResponseEntity<Object> addCar(@RequestBody final CarResponse car){
-        return carResponseService.addCar(car);
+    public ResponseEntity<?> addCar(@RequestBody final CarResponse car){
+        if (carModelRepository.findById(car.getModelId()).isPresent()){
+            return new ResponseEntity<>(carResponseService.addCar(car), HttpStatus.OK);
+        }
+        else{
+            return ResponseEntity.unprocessableEntity().body("Error: Car Model not found");
+        }
     }
 
+    // Delete Car only If Car exists & Is Available
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> deleteCar(@PathVariable final Long id){
-        return carResponseService.removeCar(id);
+    public ResponseEntity<?> deleteCar(@PathVariable final Long id){
+        if (carRepository.findById(id).isPresent()){
+            Car carToDel = carRepository.findById(id).get();
+            if (!carToDel.getInUse() || !carToDel.getIsReserved()){
+                return new ResponseEntity<>(carResponseService.deleteCar(id), HttpStatus.OK);
+            }
+            else{
+                return ResponseEntity.unprocessableEntity().body("Error: Car is in use");
+            }
+        }
+        else{
+            return ResponseEntity.unprocessableEntity().body("Error: Car not found");
+        }
     }
 
+    // Update Car only If Car exists & If Car Model exists
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateCar(@PathVariable final Long id, @RequestBody final CarResponse car){
-       return carResponseService.updateCarById(id, car);
+    public ResponseEntity<?> updateCar(@PathVariable final Long id, @RequestBody final CarResponse car){
+        if (carRepository.findById(id).isPresent()){
+            if (carModelRepository.findById(car.getModelId()).isPresent()){
+                return new ResponseEntity<>(carResponseService.updateCar(id, car), HttpStatus.OK);
+            }
+            else{
+                return ResponseEntity.unprocessableEntity().body("Error: Car Model not found");
+            }
+        }
+        else{
+            return ResponseEntity.unprocessableEntity().body("Error: Car not found");
+        }
     }
 
     //Get Mapping
@@ -62,6 +92,12 @@ public class CarController {
     @GetMapping("/all")
     public ResponseEntity<List<Car>> getAllCars() {
         return new ResponseEntity<>(carRepository.findAll(), HttpStatus.OK);
+    }
+
+    // Find Car by Search Parameter
+    @GetMapping("/all/{search}")
+    public ResponseEntity<List<Car>> getAllCars(@PathVariable String search) {
+        return new ResponseEntity<>(carService.findCarByPhrase(search), HttpStatus.OK);
     }
 
     //Get all available car by ModelId

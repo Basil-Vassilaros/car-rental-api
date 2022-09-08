@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @RestController
+@CrossOrigin(origins = "http://localhost:8080")
+
 @RequestMapping("/model")
 public class CarModelController {
     private CarModelService carModelService;
@@ -25,8 +27,8 @@ public class CarModelController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addModel(@RequestBody final CarModelResponse model) {
-        return carModelResponseService.addModel(model);
+    public ResponseEntity<CarModel> addModel(@RequestBody final CarModelResponse model) {
+        return new ResponseEntity<>(carModelResponseService.addModel(model), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -40,13 +42,8 @@ public class CarModelController {
     }
 
     @GetMapping("/details/{id}")
-    public ResponseEntity<?> getModel(@PathVariable Long id) {
-        if (carModelRepository.findById(id).isPresent()){
-            return new ResponseEntity<>(carModelRepository.getReferenceById(id), HttpStatus.OK);
-        }
-        else{
-            return ResponseEntity.unprocessableEntity().body("Model not found");
-        }
+    public ResponseEntity<CarModel> getModel(@PathVariable Long id) {
+        return new ResponseEntity<>(carModelResponseService.findModelById(id), HttpStatus.OK);
     }
 
     @GetMapping("/all")

@@ -1,14 +1,11 @@
 package com.sisekelo.carrentalapi.services.table;
 
 import com.sisekelo.carrentalapi.models.tables.Car;
-import com.sisekelo.carrentalapi.models.tables.RentalRecord;
 import com.sisekelo.carrentalapi.repository.CarRepository;
 import com.sisekelo.carrentalapi.repository.RentalRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +29,25 @@ public class CarService {
             }
         }
         return availableCars;
+    }
+
+    public List<Car> findCarByPhrase(String search){
+        List<Car> cars = carRepository.findAll();
+        List<Car> matchedList = new ArrayList<>();
+        List<String> searchIndex = new ArrayList<>();
+        for(Car car: cars){
+            searchIndex.clear();
+            searchIndex.add(car.getRegistrationNumber());
+            searchIndex.add(car.getColor());
+            searchIndex.add(car.getCarModel().getCarModel());
+            searchIndex.add(car.getCarModel().getYear());
+            searchIndex.add(car.getCarModel().getCarCategory().getCarCategory());
+            searchIndex.add(car.getCarModel().getCarManufacturer().getManufacturer());
+            if (searchIndex.contains(search)){
+                matchedList.add(car);
+            }
+        }
+        return matchedList;
     }
 
     public List<Car> getAllReservedCars(){

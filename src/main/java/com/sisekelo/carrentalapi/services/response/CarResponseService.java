@@ -33,82 +33,32 @@ public class CarResponseService {
         this.rentalRecordRepository = rentalRecordRepository;
     }
 
-    public ResponseEntity<Object> addCar(CarResponse car){
+    public List<Car> addCar(CarResponse car){
         Car newCar = new Car();
-        missing = false;
-        if (!carModelRepository.findById(car.getModelId()).isPresent()){
-            missing = true;
-            return ResponseEntity.unprocessableEntity().body("Error: Referenced Car Model not found");
-        }
-        if (!missing){
-            newCar.setCarModel(carModelRepository.getReferenceById(car.getModelId()));
-            newCar.setPrice(car.getPrice());
-            newCar.setRegistrationNumber(car.getRegistrationNumber());
-            newCar.setInUse(false);
-            newCar.setIsReserved(false);
-            newCar.setColor(car.getColor());
-            newCar.setReservedDates(new ArrayList<>());
-            carRepository.save(newCar);
-            return ResponseEntity.accepted().body("Success: Car saved");
-        }
-        else{
-            return ResponseEntity.unprocessableEntity().body("Error: Car not saved");
-        }
+        newCar.setCarModel(carModelRepository.getReferenceById(car.getModelId()));
+        newCar.setPrice(car.getPrice());
+        newCar.setRegistrationNumber(car.getRegistrationNumber());
+        newCar.setInUse(false);
+        newCar.setIsReserved(false);
+        newCar.setColor(car.getColor());
+        newCar.setBookedDates("");
+        carRepository.save(newCar);
+        return carRepository.findAll();
     }
 
-    public ResponseEntity<Object> removeCar(Long id) {
-        if (carRepository.findById(id).isPresent()){
-            Car deleteCar = carRepository.getReferenceById(id);
-            Boolean isReferenced = false;
-            // checks if car is present in any records
-            List<RentalRecord> recordList = rentalRecordRepository.findAll();
-            for (RentalRecord record:recordList) {
-                if (record.getCar() == deleteCar){
-                    isReferenced = true;
-                }
-            };
-            // if there is no reference then delete
-            if (!isReferenced){
-                carRepository.deleteById(id);
-                if(!carRepository.findById(id).isPresent()){
-                    return ResponseEntity.accepted().body("Success: Car removed");
-                }
-                else {
-                    return ResponseEntity.unprocessableEntity().body("Error: failed to delete Car");
-                }
-            }
-            else {
-                return ResponseEntity.unprocessableEntity().body("Error: The car you wish to delete is being used.");
-            }
-        }
-        else{
-            return ResponseEntity.unprocessableEntity().body("Error: Car not found");
-        }
+    public List<Car> deleteCar(Long id) {
+        carRepository.deleteById(id);
+        return carRepository.findAll();
     }
+
 
     @Transactional
-    public ResponseEntity<Object> updateCarById(Long id, CarResponse car) {
-        if (carRepository.findById(id).isPresent()) {
-            Car updateCar = carRepository.getReferenceById(id);
-            missing = false;
-            if (!carModelRepository.findById(car.getModelId()).isPresent()) {
-                missing = true;
-                return ResponseEntity.unprocessableEntity().body("Error: Referenced Car Model not found");
-            }
-            if (!missing) {
-                updateCar.setCarModel(carModelRepository.getReferenceById(car.getModelId()));
-                updateCar.setPrice(car.getPrice());
-                updateCar.setRegistrationNumber(car.getRegistrationNumber());
-                updateCar.setColor(car.getColor());
-
-                return ResponseEntity.accepted().body("Success: Car updated");
-            }
-            else{
-                return ResponseEntity.unprocessableEntity().body("Error: Car not updated");
-            }
-        }
-        else {
-            return ResponseEntity.unprocessableEntity().body("Error: Car not found");
-        }
+    public List<Car> updateCar(Long id, CarResponse car) {
+        Car updateCar = carRepository.getReferenceById(id);
+        updateCar.setCarModel(carModelRepository.getReferenceById(car.getModelId()));
+        updateCar.setPrice(car.getPrice());
+        updateCar.setRegistrationNumber(car.getRegistrationNumber());
+        updateCar.setColor(car.getColor());
+        return carRepository.findAll();
     }
 }

@@ -1,11 +1,9 @@
 package com.sisekelo.carrentalapi.services.table;
 
-import com.sisekelo.carrentalapi.models.tables.Car;
 import com.sisekelo.carrentalapi.models.tables.CarCategory;
 import com.sisekelo.carrentalapi.models.tables.CarModel;
 import com.sisekelo.carrentalapi.repository.CarCategoryRepository;
 import com.sisekelo.carrentalapi.repository.CarModelRepository;
-import com.sisekelo.carrentalapi.repository.CarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

@@ -23,5 +23,4 @@ public class Client {
 
     private String homeAddress;
 
-    private Long carsReserved;
 }

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+@CrossOrigin(origins = "http://localhost:8080")
 
 @RestController
 @RequestMapping("/reservation")
@@ -24,17 +25,17 @@ public class ReservationController {
     }
     @PostMapping("/add")
     public ResponseEntity<Object> addReservation(@RequestBody final Reservation record) {
-        return reservationService.addReservation(record);
-    }
-
-    @PostMapping("/book/{id}")
-    public ResponseEntity<Object> addBooking(@RequestBody final Long id) {
-        return reservationService.addBooking(id);
+        return reservationService.addNewRecord(record);
     }
 
     @DeleteMapping("/checkout/{id}")
     public ResponseEntity<Object> checkoutReservation(@PathVariable final Long id){
         return reservationService.removeReservation(id);
+    }
+
+    @DeleteMapping("/remove/{id}")
+    public ResponseEntity<Object> removeRecord(@PathVariable final Long id){
+        return reservationService.removeBooking(id);
     }
 
     @PutMapping("/update/{id}")

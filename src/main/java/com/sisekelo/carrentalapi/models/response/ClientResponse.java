@@ -7,7 +7,6 @@ import javax.persistence.*;
 
 @Data
 public class ClientResponse {
-        private Long clientId;
 
         private String firstName;
 
