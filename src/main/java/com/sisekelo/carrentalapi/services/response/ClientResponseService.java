@@ -1,6 +1,7 @@
 package com.sisekelo.carrentalapi.services.response;
 
 import com.sisekelo.carrentalapi.models.response.ClientResponse;
+import com.sisekelo.carrentalapi.models.tables.Car;
 import com.sisekelo.carrentalapi.models.tables.Client;
 import com.sisekelo.carrentalapi.models.tables.RentalRecord;
 import com.sisekelo.carrentalapi.repository.ClientRepository;
@@ -26,64 +27,113 @@ public class ClientResponseService {
     }
 
     public ResponseEntity<Object> addClient(ClientResponse client){
+        // Check if new Client is a duplicate
+        List<Client> clients = clientRepository.findAll();
+        for (Client existingClient : clients){
+            if (existingClient.getFirstName().equals(client.getFirstName()) &&
+            existingClient.getLastName().equals(client.getLastName()) &&
+            existingClient.getEmailAddress().equals(client.getEmailAddress()) &&
+            existingClient.getHomeAddress().equals(client.getHomeAddress()) &&
+            existingClient.getMobileNumber().equals(client.getMobileNumber())){
+                return ResponseEntity.unprocessableEntity().body("Error: Client already exists");
+            }
+        }
+
+        // Set values for new Client
         Client newClient = new Client();
         newClient.setEmailAddress(client.getEmailAddress());
         newClient.setFirstName(client.getFirstName());
         newClient.setLastName(client.getLastName());
         newClient.setHomeAddress(client.getHomeAddress());
-
         newClient.setMobileNumber(client.getMobileNumber());
-        newClient.setReservedCars("");
+
+        // Save new Client
         clientRepository.save(newClient);
+
+        // Success
         return ResponseEntity.accepted().body("Success: Client saved");
     }
 
     public ResponseEntity<Object> deleteClient (Long id) {
-        if(clientRepository.findById(id).isPresent()){
-             /*
-                If the Client that I wish to delete is referenced to a Rental Record
-                then I cannot delete the Client until it no longer is referenced
-            */
-            Boolean isReferenced = false;
-            List<RentalRecord> listToReference = rentalRecordRepository.findAll();// the list to see if there are any references
-            List<Long> referenceExistList = new ArrayList<Long>();// a list to save the IDs of the entities referencing
-            Client reference = clientRepository.findById(id).get();// the entity I want to delete
-            for (RentalRecord toReference : listToReference) {
-                if (toReference.getClient() == reference) {
-                    isReferenced = true;
-                    referenceExistList.add(toReference.getRentalId());
-                }
-            }
-            if (!isReferenced) {
-                clientRepository.deleteById(id);
-            } else {
-                return ResponseEntity.unprocessableEntity().body("Failed to delete client: Reference to Rental Record (" + referenceExistList + ")");
-            }
-            if(clientRepository.findById(id).isPresent()){
-                return ResponseEntity.unprocessableEntity().body("Failed to delete client: Unknown");
-            }
-            else {
-                return ResponseEntity.ok().body("Success: Deleted client");
+        // Check if referenced Client exists
+        if (clientRepository.findById(id).isEmpty()){
+            return ResponseEntity.unprocessableEntity().body("Error: Client not found");
+        }
+        Client client = clientRepository.getReferenceById(id);
+
+        // Check if Client is being used
+        List<RentalRecord> records = rentalRecordRepository.findAll();
+        for (RentalRecord record: records) {
+            if (record.getClient().equals(client)){
+                return ResponseEntity.unprocessableEntity().body("Error: Client is used by Record "+record.getRentalId());
             }
         }
-        else{
-            return ResponseEntity.unprocessableEntity().body("Client not found");
+
+        // Delete Client
+        clientRepository.deleteById(id);
+
+        // Check if Client was deleted
+        if (clientRepository.findById(id).isPresent()){
+            return ResponseEntity.unprocessableEntity().body("Error: Failed to delete Client");
         }
+
+        // Success
+        return ResponseEntity.ok().body("Success: Deleted client");
     }
 
     @Transactional
     public ResponseEntity<Object> updateClientById(Long id, ClientResponse client) {
-        if (clientRepository.findById(id).isPresent()) {
-            Client updatedClient = clientRepository.getReferenceById(id);
-            updatedClient.setEmailAddress(client.getEmailAddress());
-            updatedClient.setFirstName(client.getFirstName());
-            updatedClient.setLastName(client.getLastName());
-            updatedClient.setHomeAddress(client.getHomeAddress());
-            updatedClient.setMobileNumber(client.getMobileNumber());
-            return ResponseEntity.accepted().body("Success: Car updated");
+        // Check if referenced Client exists
+        if (clientRepository.findById(id).isEmpty()){
+            return ResponseEntity.unprocessableEntity().body("Error: Client not found");
         }
-        else {
-            return ResponseEntity.unprocessableEntity().body("Client not found");
+        Client updatedClient = clientRepository.getReferenceById(id);
+
+        // Check if new Client is a duplicate
+        List<Client> clients = clientRepository.findAll();
+        for (Client existingClient : clients){
+            if (existingClient.getFirstName().equals(client.getFirstName()) &&
+                    existingClient.getLastName().equals(client.getLastName()) &&
+                    existingClient.getEmailAddress().equals(client.getEmailAddress()) &&
+                    existingClient.getHomeAddress().equals(client.getHomeAddress()) &&
+                    existingClient.getMobileNumber().equals(client.getMobileNumber())){
+                return ResponseEntity.unprocessableEntity().body("Error: Client already exists");
+            }
         }
+
+        // Set values for updated Client
+        updatedClient.setEmailAddress(client.getEmailAddress());
+        updatedClient.setFirstName(client.getFirstName());
+        updatedClient.setLastName(client.getLastName());
+        updatedClient.setHomeAddress(client.getHomeAddress());
+        updatedClient.setMobileNumber(client.getMobileNumber());
+
+        // Success
+        return ResponseEntity.accepted().body("Success: Client updated");
+    }
+
+    public List<Client> searchClient(String search){
+        // Initialize our lists
+        List<Client> clients = clientRepository.findAll();
+        List<Client> found = new ArrayList<>();
+
+        // Loop through to find matches
+        for (Client client:clients){
+            // Make an index to search by
+            List<String> index = new ArrayList<>();
+            index.add(client.getFirstName());
+            index.add(client.getLastName());
+            index.add(client.getHomeAddress());
+            index.add(client.getEmailAddress());
+            index.add(client.getMobileNumber());
+
+            // find matches
+            if (index.contains(search)){
+                found.add(client);
+            }
+        }
+
+        // Success
+        return found;
     }
 }

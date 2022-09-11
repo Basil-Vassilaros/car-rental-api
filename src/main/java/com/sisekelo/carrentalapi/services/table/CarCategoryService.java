@@ -1,6 +1,8 @@
 package com.sisekelo.carrentalapi.services.table;
 
+import com.sisekelo.carrentalapi.models.tables.Car;
 import com.sisekelo.carrentalapi.models.tables.CarCategory;
+import com.sisekelo.carrentalapi.models.tables.CarManufacturer;
 import com.sisekelo.carrentalapi.models.tables.CarModel;
 import com.sisekelo.carrentalapi.repository.CarCategoryRepository;
 import com.sisekelo.carrentalapi.repository.CarModelRepository;
@@ -23,57 +25,86 @@ public class CarCategoryService {
         this.carModelRepository = carModelRepository;
     }
 
-    public CarCategory addCategory(CarCategory carCategory){
-        return carCategoryRepository.save(carCategory);
-    }
+    public ResponseEntity<Object>  addCategory(CarCategory carCategory){
+        // Checks for if new Category is a duplicate
+        List<CarCategory> carCategoryList = carCategoryRepository.findAll();
+        for (CarCategory category: carCategoryList) {
+            if (category.getCarCategory().equals(carCategory.getCarCategory())){
+                return ResponseEntity.unprocessableEntity().body("Error: Category already exists");
+            }
+        }
 
-    public CarCategory getCategory(Long id){
-        return carCategoryRepository.getReferenceById(id);
-    }
+        // Save new Category
+        carCategoryRepository.save(carCategory);
 
-    public List<CarCategory> getAllCategory(){
-        return carCategoryRepository.findAll();
+        // Success
+        return ResponseEntity.ok().body("Success: added Category");
     }
 
     @Transactional
-    public CarCategory updateCategoryById(Long id, CarCategory carCategory){
+    public ResponseEntity<Object>  updateCategoryById(Long id, CarCategory carCategory){
+        // Check if referenced Category exists
+        if (carCategoryRepository.findById(id).isEmpty()){
+            return ResponseEntity.unprocessableEntity().body("Error: Category does not exist");
+        }
         CarCategory updatedCategory = carCategoryRepository.getReferenceById(id);
 
+        // Checks for if updated Category is a duplicate
+        List<CarCategory> carCategoryList = carCategoryRepository.findAll();
+        for (CarCategory category: carCategoryList) {
+            if (category.getCarCategory().equals(carCategory.getCarCategory()) &&
+                    !(category.getCategoryId().equals(id))){
+                return ResponseEntity.unprocessableEntity().body("Error: Category already exists");
+            }
+        }
+
+        // Update Category
         updatedCategory.setCarCategory(carCategory.getCarCategory());
 
-        return updatedCategory;
+        // Success
+        return ResponseEntity.ok().body("Success: updated Category");
     }
 
     public ResponseEntity<Object> deleteCategory(Long id){
-        if(carCategoryRepository.findById(id).isPresent()){
-             /*
-                If the Car Category that I wish to delete is referenced to a Car Model
-                then I cannot delete the Car Category until it no longer is referenced
-            */
-            Boolean isReferenced = false;
-            List<CarModel> listToReference = carModelRepository.findAll();// the list to see if there are any references
-            List<Long> referenceExistList = new ArrayList<Long>();// a list to save the IDs of the entities referencing
-            CarCategory reference = carCategoryRepository.findById(id).get();// the entity I want to delete
-            for (CarModel toReference : listToReference) {
-                if (toReference.getCarCategory() == reference) {
-                    isReferenced = true;
-                    referenceExistList.add(toReference.getModelId());
-                }
-            }
-            if (!isReferenced) {
-                carCategoryRepository.deleteById(id);
-            } else {
-                return ResponseEntity.unprocessableEntity().body("Failed to delete category: Reference to Car (" + referenceExistList + ")");
-            }
-            if(carCategoryRepository.findById(id).isPresent()){
-                return ResponseEntity.unprocessableEntity().body("Failed to delete category: Unknown");
-            }
-            else {
-                return ResponseEntity.ok().body("Success: deleted category");
+        // Check if referenced Category exists
+        if (carCategoryRepository.findById(id).isEmpty()){
+            return ResponseEntity.unprocessableEntity().body("Error: Category does not exist");
+        }
+        CarCategory category = carCategoryRepository.getReferenceById(id);
+
+        // Check if Category is used in another entity
+        List<CarModel> carModelList = carModelRepository.findAll();
+        for (CarModel model : carModelList){
+            if (model.getCarCategory().equals(category)){
+                return ResponseEntity.unprocessableEntity().body("Error: Category in use by Car Model: "+model.getModelId());
             }
         }
-        else{
-            return ResponseEntity.unprocessableEntity().body("Category not found");
+
+        // Delete Category
+        carCategoryRepository.deleteById(id);
+
+        // Check if Category deleted
+        if(carCategoryRepository.findById(id).isEmpty()) {
+            return ResponseEntity.unprocessableEntity().body("Error: Failed to delete Category");
         }
+
+        // Success
+        return ResponseEntity.ok().body("Success: deleted category");
+    }
+
+    public List<CarCategory> searchCategory(String search){
+        // Initialize our lists
+        List<CarCategory> categories = carCategoryRepository.findAll();
+        List<CarCategory> found = new ArrayList<>();
+
+        // Loop through to find matches
+        for (CarCategory category:categories){
+            if (category.getCarCategory().contains(search)){
+                found.add(category);
+            }
+        }
+
+        // Success
+        return found;
     }
 }

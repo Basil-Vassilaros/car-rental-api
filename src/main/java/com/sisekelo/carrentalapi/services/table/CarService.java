@@ -20,6 +20,7 @@ public class CarService {
         this.rentalRecordRepository = rentalRecordRepository;
     }
 
+
     public List<Car> getAllAvailableCars(){
         List<Car> cars = carRepository.findAll();
         List<Car> availableCars = new ArrayList<Car>();
@@ -29,25 +30,6 @@ public class CarService {
             }
         }
         return availableCars;
-    }
-
-    public List<Car> findCarByPhrase(String search){
-        List<Car> cars = carRepository.findAll();
-        List<Car> matchedList = new ArrayList<>();
-        List<String> searchIndex = new ArrayList<>();
-        for(Car car: cars){
-            searchIndex.clear();
-            searchIndex.add(car.getRegistrationNumber());
-            searchIndex.add(car.getColor());
-            searchIndex.add(car.getCarModel().getCarModel());
-            searchIndex.add(car.getCarModel().getYear());
-            searchIndex.add(car.getCarModel().getCarCategory().getCarCategory());
-            searchIndex.add(car.getCarModel().getCarManufacturer().getManufacturer());
-            if (searchIndex.contains(search)){
-                matchedList.add(car);
-            }
-        }
-        return matchedList;
     }
 
     public List<Car> getAllReservedCars(){

@@ -3,6 +3,7 @@ package com.sisekelo.carrentalapi.services.response;
 import com.sisekelo.carrentalapi.models.exceptions.NotFoundException;
 import com.sisekelo.carrentalapi.models.exceptions.ReferenceExistException;
 import com.sisekelo.carrentalapi.models.response.CarModelResponse;
+import com.sisekelo.carrentalapi.models.tables.Car;
 import com.sisekelo.carrentalapi.models.tables.CarCategory;
 import com.sisekelo.carrentalapi.models.tables.CarManufacturer;
 import com.sisekelo.carrentalapi.models.tables.CarModel;
@@ -15,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CarModelResponseService {
@@ -33,70 +36,133 @@ public class CarModelResponseService {
         this.carCategoryRepository = carCategoryRepository;
     }
 
-    public CarModel findModelById(Long id){
-        return carModelRepository.findById(id).orElseThrow( ()
-                -> new NotFoundException(id, "model"));
-    }
+    public ResponseEntity<Object> addModel(CarModelResponse model){
+        // Check if referenced manufacturer exists
+        if (carManufacturerRepository.findById(model.getManufacturerId()).isEmpty()){
+            return ResponseEntity.unprocessableEntity().body("Error: Manufacturer not found");
+        }
+        CarManufacturer refMan = carManufacturerRepository.findById(model.getManufacturerId()).get();
 
-    public CarModel addModel(CarModelResponse model){
+        // Check if referenced category exists
+        if (carCategoryRepository.findById(model.getCategoryId()).isEmpty()){
+            return ResponseEntity.unprocessableEntity().body("Error: Category not found");
+        }
+        CarCategory refCat = carCategoryRepository.findById(model.getCategoryId()).get();
+
+        // Check if new model is a duplicate
+        List<CarModel> modelList = carModelRepository.findAll();
+        for (CarModel carModel: modelList) {
+            if (carModel.getCarModel().equals(model.getCarModel()) &&
+                    carModel.getCarCategory().getCategoryId().equals(model.getCategoryId()) &&
+                    carModel.getCarManufacturer().getManufacturerId().equals(model.getManufacturerId()) &&
+                    carModel.getYear().equals(model.getYear())){
+                return ResponseEntity.unprocessableEntity().body("Error: Specified Car Model already exists");
+            }
+        }
+
+        // Set values for new model
         CarModel newModel = new CarModel();
-
-        CarManufacturer refMan = carManufacturerRepository.findById(model.getManufacturerId()).orElseThrow(() ->
-                new NotFoundException(model.getManufacturerId(), "manufacturer"));
-        CarCategory refCat = carCategoryRepository.findById(model.getCategoryId()).orElseThrow(() ->
-                new NotFoundException(model.getCategoryId(), "category"));
-
         newModel.setCarManufacturer(refMan);
         newModel.setCarCategory(refCat);
         newModel.setCarModel(model.getCarModel());
         newModel.setYear(model.getYear());
 
-        return carModelRepository.save(newModel);
-    }
+        // Save new model
+        carModelRepository.save(newModel);
 
-    public ResponseEntity<Object> removeCarModel(Long id) {
-        CarModel modelDelete = carModelRepository.findById(id).orElseThrow( ()
-                -> new NotFoundException(id, "model"));
-        if (carRepository.findAll().contains(modelDelete)){
-            throw new ReferenceExistException(id, "model", "car");
-        }
-        else{
-            carModelRepository.deleteById(id);
-            if(!carModelRepository.findById(id).isPresent()){
-                return ResponseEntity.accepted().body("Success: Car Model removed");
-            }
-            else {
-                return ResponseEntity.unprocessableEntity().body("Error: failed to delete Car Model");
-            }
-        }
+        // Success
+        return ResponseEntity.accepted().body("Success: Car Model saved");
     }
 
     @Transactional
     public ResponseEntity<Object> updateCarModelById(Long id, CarModelResponse model) {
-        if (carModelRepository.findById(id).isPresent()) {
-            CarModel updateModel = carModelRepository.getReferenceById(id);
-            missing = false;
-            if (!carManufacturerRepository.findById(model.getManufacturerId()).isPresent()){
-                missing = true;
-                return ResponseEntity.unprocessableEntity().body("Error: Referenced Car Manufacturer not found");
-            }
-            if (!carCategoryRepository.findById(model.getCategoryId()).isPresent()){
-                missing = true;
-                return ResponseEntity.unprocessableEntity().body("Error: Referenced Car Category not found");
-            }
-            if (!missing){
-                updateModel.setCarManufacturer(carManufacturerRepository.getReferenceById(model.getManufacturerId()));
-                updateModel.setCarCategory(carCategoryRepository.getReferenceById(model.getCategoryId()));
-                updateModel.setCarModel(model.getCarModel());
-                updateModel.setYear(model.getYear());
-                return ResponseEntity.accepted().body("Success: Car Model updated");
-            }
-            else{
-                return ResponseEntity.unprocessableEntity().body("Error: Car Model not updated");
+        //Check if referenced Car Model exists
+        if (carModelRepository.findById(id).isEmpty()){
+            return ResponseEntity.unprocessableEntity().body("Error: Model not found");
+        }
+        CarModel updateModel = carModelRepository.findById(id).get();
+
+        // Check if referenced manufacturer exists
+        if (carManufacturerRepository.findById(model.getManufacturerId()).isEmpty()){
+            return ResponseEntity.unprocessableEntity().body("Error: Manufacturer not found");
+        }
+        CarManufacturer refMan = carManufacturerRepository.findById(model.getManufacturerId()).get();
+
+        // Check if referenced category exists
+        if (carCategoryRepository.findById(model.getCategoryId()).isEmpty()){
+            return ResponseEntity.unprocessableEntity().body("Error: Category not found");
+        }
+        CarCategory refCat = carCategoryRepository.findById(model.getCategoryId()).get();
+
+        // Check if updated Model is a duplicate
+        List<CarModel> modelList = carModelRepository.findAll();
+        for (CarModel carModel: modelList) {
+            if (carModel.getCarModel().equals(model.getCarModel()) &&
+                    carModel.getCarCategory().getCategoryId().equals(model.getCategoryId()) &&
+                    carModel.getCarManufacturer().getManufacturerId().equals(model.getManufacturerId()) &&
+                    carModel.getYear().equals(model.getYear())){
+                return ResponseEntity.unprocessableEntity().body("Error: Specified Car Model already exists");
             }
         }
-        else {
-            return ResponseEntity.unprocessableEntity().body("Error: Car Model not found");
+
+        // Set values for updated Model
+        updateModel.setCarManufacturer(refMan);
+        updateModel.setCarCategory(refCat);
+        updateModel.setCarModel(model.getCarModel());
+        updateModel.setYear(model.getYear());
+
+        // Success
+        return ResponseEntity.accepted().body("Success: Car Model updated");
+    }
+
+    public ResponseEntity<Object> removeCarModel(Long id) {
+        //Check if referenced Car Model exists
+        if (carRepository.findById(id).isEmpty()){
+            return ResponseEntity.unprocessableEntity().body("Error: Model not found");
         }
+        CarModel modelDelete = carModelRepository.findById(id).get();
+
+        // Check if Car Model is being used
+        List<Car> carList = carRepository.findAll();
+        for (Car car : carList){
+            if (car.getCarModel().equals(modelDelete)){
+                return ResponseEntity.unprocessableEntity().body("Error: Model is used by Car "+car.getCarId());
+            }
+        }
+
+        // Delete Car Model
+        carModelRepository.deleteById(id);
+
+        // Check if it did delete
+        if (carModelRepository.findById(id).isPresent()){
+            return ResponseEntity.unprocessableEntity().body("Error: failed to delete Car Model");
+        }
+
+        // Success
+        return ResponseEntity.accepted().body("Success: Car Model removed");
+    }
+
+    public List<CarModel> searchModel(String search){
+        // Initialize our lists
+        List<CarModel> models = carModelRepository.findAll();
+        List<CarModel> found = new ArrayList<>();
+
+        // Loop through to find matches
+        for (CarModel model:models){
+            // Make an index to search by
+            List<String> index = new ArrayList<>();
+            index.add(model.getCarModel());
+            index.add(model.getCarManufacturer().getManufacturer());
+            index.add(model.getCarCategory().getCarCategory());
+            index.add(model.getYear());
+
+            // find matches
+            if (index.contains(search)){
+                found.add(model);
+            }
+        }
+
+        // Success
+        return found;
     }
 }

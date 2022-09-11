@@ -1,5 +1,7 @@
 package com.sisekelo.carrentalapi.services.table;
 
+import com.sisekelo.carrentalapi.models.tables.Car;
+import com.sisekelo.carrentalapi.models.tables.CarCategory;
 import com.sisekelo.carrentalapi.models.tables.CarManufacturer;
 import com.sisekelo.carrentalapi.models.tables.CarModel;
 import com.sisekelo.carrentalapi.repository.CarManufacturerRepository;
@@ -23,57 +25,79 @@ public class CarManufacturerService {
         this.carModelRepository = carModelRepository;
     }
 
-    public CarManufacturer addManufacturer(CarManufacturer carManufacturer){
-        return carManufacturerRepository.save(carManufacturer);
-    }
-
-    public CarManufacturer getManufacturer(Long id){
-        return carManufacturerRepository.getReferenceById(id);
-    }
-
-    public List<CarManufacturer> getAllManufacturer(){
-        return carManufacturerRepository.findAll();
+    public ResponseEntity<Object> addManufacturer(CarManufacturer carManufacturer){
+        // Check if new Manufacturer is a duplicate
+        List<CarManufacturer> carManufacturerList = carManufacturerRepository.findAll();
+        for (CarManufacturer manufacturer: carManufacturerList) {
+            if (manufacturer.getManufacturer().equals(carManufacturer.getManufacturer())){
+                return ResponseEntity.unprocessableEntity().body("Error: Manufacturer already exists");
+            }
+        }
+        carManufacturerRepository.save(carManufacturer);
+        return ResponseEntity.ok().body("Success: added manufacturer");
     }
 
     @Transactional
-    public CarManufacturer updateManufacturerById(Long id, CarManufacturer carManufacturer){
+    public ResponseEntity<Object> updateManufacturerById(Long id, CarManufacturer carManufacturer){
+        // Check if Ref Manufacturer exists
+        if (carManufacturerRepository.findById(id).isEmpty()){
+            return ResponseEntity.unprocessableEntity().body("Error: Manufacturer not found");
+        }
         CarManufacturer updatedManufacturer = carManufacturerRepository.getReferenceById(id);
 
-        updatedManufacturer.setManufacturer(carManufacturer.getManufacturer());
+        // Check if updated Manufacturer is a duplicate
+        List<CarManufacturer> carManufacturerList = carManufacturerRepository.findAll();
+        for (CarManufacturer manufacturer: carManufacturerList) {
+            if (manufacturer.getManufacturer().equals(carManufacturer.getManufacturer()) && manufacturer.getManufacturerId() != id){
+                return ResponseEntity.unprocessableEntity().body("Error: Manufacturer already exists");
+            }
+        }
 
-        return updatedManufacturer;
+        // Update the manufacturer
+        updatedManufacturer.setManufacturer(carManufacturer.getManufacturer());
+        return ResponseEntity.ok().body("Success: updated manufacturer");
+
     }
 
     public ResponseEntity<Object> deleteManufacturer(Long id){
-        if(carManufacturerRepository.findById(id).isPresent()){
-            /*
-                If the Car Manufacturer that I wish to delete is referenced to a Car Model
-                then I cannot delete the Car Manufacturer until it no longer is referenced
-            */
-            Boolean isReferenced = false;
-            List<CarModel> listToReference = carModelRepository.findAll();// the list to see if there are any references
-            List<Long> referenceExistList = new ArrayList<Long>();// a list to save the IDs of the entities referencing
-            CarManufacturer reference = carManufacturerRepository.findById(id).get();// the entity I want to delete
-            for (CarModel toReference : listToReference) {
-                if (toReference.getCarManufacturer() == reference) {
-                    isReferenced = true;
-                    referenceExistList.add(toReference.getModelId());
-                }
-            }
-            if (!isReferenced) {
-                carModelRepository.deleteById(id);
-            } else {
-                return ResponseEntity.unprocessableEntity().body("Failed to delete manufacturer: Reference to Car Model (" + referenceExistList + ")");
-            }
-            if(carManufacturerRepository.findById(id).isPresent()){
-                return ResponseEntity.unprocessableEntity().body("Failed to delete manufacturer: Unknown");
-            }
-            else {
-                return ResponseEntity.ok().body("Success: deleted manufacturer");
+        // Check if Ref Manufacturer exists
+        if (carManufacturerRepository.findById(id).isEmpty()){
+            return ResponseEntity.unprocessableEntity().body("Error: Manufacturer not found");
+        }
+        CarManufacturer manufacturerToDelete = carManufacturerRepository.getReferenceById(id);
+
+        // Check if Manufacturer is being used
+        List<CarModel> carModelList = carModelRepository.findAll();
+        for (CarModel model : carModelList) {
+            if (model.getCarManufacturer() == manufacturerToDelete) {
+                return ResponseEntity.unprocessableEntity().body("Error: Manufacturer in use by Car Model "+model.getCarModel());
             }
         }
-        else{
-            return ResponseEntity.unprocessableEntity().body("Manufacturer not found");
+
+        // Delete the manufacturer
+        carManufacturerRepository.deleteById(id);
+
+        // Check if the Manufacturer is deleted
+        if (carManufacturerRepository.findById(id).isPresent()){
+            return ResponseEntity.unprocessableEntity().body("Error: failed to delete Manufacturer");
         }
+
+        return ResponseEntity.ok().body("Success: deleted manufacturer");
+    }
+
+    public List<CarManufacturer> searchManufacterer(String search){
+        // Initialize our lists
+        List<CarManufacturer> manufacturers = carManufacturerRepository.findAll();
+        List<CarManufacturer> found = new ArrayList<>();
+
+        // Loop through to find matches
+        for (CarManufacturer manufacturer:manufacturers){
+            if (manufacturer.getManufacturer().contains(search)){
+                found.add(manufacturer);
+            }
+        }
+
+        // Success
+        return found;
     }
 }

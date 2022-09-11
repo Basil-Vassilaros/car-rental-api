@@ -1,5 +1,6 @@
 package com.sisekelo.carrentalapi.controllers;
 
+import com.sisekelo.carrentalapi.models.tables.Car;
 import com.sisekelo.carrentalapi.models.tables.CarCategory;
 import com.sisekelo.carrentalapi.repository.CarCategoryRepository;
 import com.sisekelo.carrentalapi.services.table.CarCategoryService;
@@ -24,8 +25,8 @@ public class CarCategoryController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<CarCategory> addCategory(@RequestBody final CarCategory carCategory) {
-        return new ResponseEntity<>(carCategoryService.addCategory(carCategory), HttpStatus.OK);
+    public ResponseEntity<Object> addCategory(@RequestBody final CarCategory carCategory) {
+        return carCategoryService.addCategory(carCategory);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -34,23 +35,25 @@ public class CarCategoryController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<CarCategory> updateCategory(@PathVariable final Long id, @RequestBody final CarCategory category){
-        CarCategory updatedCategory = carCategoryService.updateCategoryById(id, category);
-        return new ResponseEntity<>(updatedCategory, HttpStatus.OK);
+    public ResponseEntity<Object> updateCategory(@PathVariable final Long id, @RequestBody final CarCategory category){
+        return carCategoryService.updateCategoryById(id, category);
     }
 
     @GetMapping("/details/{id}")
     public ResponseEntity<?> getCategory(@PathVariable Long id) {
-        if (carCategoryRepository.findById(id).isPresent()){
-            return new ResponseEntity<>(carCategoryRepository.getReferenceById(id), HttpStatus.OK);
+        if (carCategoryRepository.findById(id).isEmpty()){
+            return ResponseEntity.unprocessableEntity().body("Error: Category not found");
         }
-        else{
-            return ResponseEntity.unprocessableEntity().body("Car Category not found");
-        }
+        return new ResponseEntity<>(carCategoryRepository.getReferenceById(id), HttpStatus.OK);
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<CarCategory>> getAllCategory() {
         return new ResponseEntity<>(carCategoryRepository.findAll(), HttpStatus.OK);
+    }
+
+    @GetMapping("/search/{search}")
+    public ResponseEntity<List<CarCategory>> search(@PathVariable String search) {
+        return new ResponseEntity<>(carCategoryService.searchCategory(search), HttpStatus.OK);
     }
 }

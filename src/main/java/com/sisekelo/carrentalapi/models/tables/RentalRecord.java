@@ -18,11 +18,11 @@ public class RentalRecord {
     private Long rentalId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="carId", nullable = false, updatable = false)
+    @JoinColumn(name="carId", nullable = false)
     private Car car;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="clientId", nullable = false, updatable = false)
+    @JoinColumn(name="clientId", nullable = false)
     private Client client;
 
     @Column(nullable = false, columnDefinition = "DATE")
